@@ -1,0 +1,249 @@
+# Gaza News - Node.js Web Application
+
+## Project Description
+
+A small web application that fetches and displays the latest news and updates about aid in Gaza.
+The app automatically retrieves news from the Motqdmon website using the RSS feed, stores it in MongoDB, and provides an API to fetch news and add likes etc.
+
+---
+
+## Requirements
+
+- Express
+- Node.js 18+
+- MongoDB (local or remote)
+
+---
+
+## Project Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd gaza-news
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start MongoDB (locally):
+
+```bash
+mongod
+```
+
+4. Start the project:
+
+```bash
+npm start
+```
+
+Or to run with nodemon for development:
+
+```bash
+npm start
+```
+
+---
+
+## File Structure
+
+```
+gaza-news/
+│
+├─ package.json
+├─ index.js
+├─ config/
+│   └─ db.js
+├─ modules/
+│   └─ News.js
+├─ Routing/
+│   ├─ News.js
+│   ├─ Likes.js
+│
+├─ controllers/
+│   ├─ News.js
+│   └─ Likes.js
+├─ services/
+│   └─ scraper.js
+└─ utils/
+    └─ Response.js
+```
+
+---
+
+## API Endpoints
+
+### 1. Fetch News
+
+- **Method:** GET
+- **URL:**
+
+```
+http://localhost:3000/api/news
+```
+
+- **Query Parameters:**
+
+  - `page` (optional, default=1): page number for pagination
+  - `limit` (optional, default=10): number of news per page
+  - `sort` (`asc` or `desc`): sort by date
+  - `title` (optional): filter by news title (partial match)
+  - `date` (optional, format YYYY-MM-DD): filter by date
+
+- **Example Requests:**
+
+```
+GET http://localhost:3000/api/news
+GET http://localhost:3000/api/news?page=1&limit=5
+GET http://localhost:3000/api/news?sort=asc&title=Gaza
+GET http://localhost:3000/api/news?date=2025-01-12
+```
+
+- **Sample Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Success",
+  "data": [
+    {
+      "_id": "650f1a2b3c4d5e6f7890abcd",
+      "title": "New food aid distribution in Gaza",
+      "date": "2025-01-12T09:00:00.000Z",
+      "likes": 0
+    }
+  ]
+}
+```
+
+---
+
+### 2. Run Scraper and Store News
+
+- **Method:** POST
+- **URL:**
+
+```
+http://localhost:3000/api/scrape
+```
+
+- **Description:** Fetches the first 10 news items from the RSS feed and stores them in MongoDB. Duplicate news will be ignored.
+
+- **Body:** Empty
+
+- **Headers:** None
+
+- **Sample Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Scraping completed successfully",
+  "data": null
+}
+```
+
+- **RSS Feed Used:**
+
+```
+https://www.motqdmon.com/feeds/posts/default/-/المساعدات?alt=json&max-results=10
+```
+
+---
+
+### 3. Add Like to a News Item
+
+- **Method:** POST
+- **URL:**
+
+```
+http://localhost:3000/api/like/:id
+```
+
+- **Description:** Increments the like count of a news item by its `_id`.
+
+- **Body:** Empty
+
+- **Headers:** None
+
+- **Example:**
+
+```
+POST http://localhost:3000/api/like/650f1a2b3c4d5e6f7890abcd
+```
+
+- **Sample Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Like added",
+  "data": {
+    "_id": "650f1a2b3c4d5e6f7890abcd",
+    "title": "New food aid distribution in Gaza",
+    "likes": 1
+  }
+}
+```
+
+---
+
+## Database (MongoDB)
+
+- **Collection:** `news`
+- **Document Structure:**
+
+```json
+{
+  "title": "News title",
+  "date": "Publish date",
+  "likes": 0
+}
+```
+
+- **Index:** Unique index on `title` to prevent duplicates.
+
+---
+
+## Important Notes
+
+The project uses **RSS Feed** instead of traditional web scraping because the Motqdmon website uses JavaScript to render posts.
+
+---
+
+## Testing the Project
+
+1. Start the server.
+2. Run the scraper once to populate MongoDB:
+
+```
+POST http://localhost:3000/api/scrape
+```
+
+3. Fetch news:
+
+```
+GET http://localhost:3000/api/news
+```
+
+4. Copy the `_id` of a news item and add a like:
+
+```
+POST http://localhost:3000/api/like/:id
+```
+
+5. Verify the like was updated:
+
+```
+GET http://localhost:3000/api/news
+```
+
+Express & Node.js Tutorial :: [https://github.com/Abdallah-Mushtaha/Express-Tutorial]
+
+Developed by **Abdallah Mushtaha**  
+[GitHub](https://github.com/Abdallah-Mushtaha) | [Portfolio](https://abdallahmushtaha.vercel.app/) | [LinkedIn](https://www.linkedin.com/in/abdallah-mushtaha-138b42294/)

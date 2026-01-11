@@ -27,4 +27,38 @@ export class Reviwer {
     static validation(reviewData) {
         return reviewerValidator.validate(reviewData);
     }
+    static getone = (_id) => {
+        return new Promise((resolve, reject) => {
+            dbConiction('reviews', async (db) => {
+                try {
+                    const review = await db.findOne({ _id: _id });
+                    if (!review) {
+                        throw createError(404, "review not found");
+                    }
+                    return review
+
+                } catch (error) {
+                    throw createError(500, "Error fetching review");
+                }
+            })
+        })
+    }
+
+    static remove(_id, cb) {
+        try {
+            dbConiction('reviews', async (db) => {
+                await db.deleteOne({ _id: _id });
+                cb({
+                    status: 200,
+                    message: "review deleted successfully"
+                });
+            })
+        } catch (error) {
+            cb({
+                status: 500,
+                message: "Error deleting review"
+            });
+        }
+    }
+
 }

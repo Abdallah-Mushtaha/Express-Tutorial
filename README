@@ -1,0 +1,18 @@
+# Node.js & Express Practical Tutorial
+
+## Project Overview
+
+This repository contains a practical application developed during my learning journey with **Node.js** and **Express.js**. It demonstrates the core concepts of building a backend application including:
+
+- REST API development
+- MongoDB integration
+- Web scraping techniques
+- Middleware usage
+- Handling requests and responses in Express
+
+The project is intended for educational purposes and as a hands-on exercise to strengthen my understanding of Node.js and Express.js.
+
+---
+
+Developed by **Abdallah Mushtaha**
+[GitHub](https://github.com/Abdallah-Mushtaha) | [Portfolio](https://abdallahmushtaha.vercel.app/) | [LinkedIn](https://www.linkedin.com/in/abdallah-mushtaha-138b42294/)

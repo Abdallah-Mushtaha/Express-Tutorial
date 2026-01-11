@@ -2,6 +2,7 @@ import { User, Reviews } from "../module/index.js";
 import createError from "http-errors";
 import jwt from "jsonwebtoken";
 import ReadFileSync from "fs";
+import { json } from "stream/consumers";
 
 export const Sign_in = (req, res, next) => {
     const userData = req.body;
@@ -33,7 +34,8 @@ export const Sign_in = (req, res, next) => {
                 reviewer.save(
                     (status) => {
                         if (status.status === 201) {
-                            res.status(status.status).json(status);
+                            // res.status(status.status).json(status);
+                            returnJson(res, status.status, status.status, status.message, status.data);
                         } else {
                             return next(createError(status.status, "user created but can't add review"));
                         }
@@ -53,8 +55,9 @@ export const Log_in = (req, res, next) => {
             if (result.status === 200) {
                 const JWTKey = ReadFileSync("./config/privet.key");
 
-                const token = jwt.sign({ _id: result._id, reviewerID: result.reviewerID });
-                res.status(result.status).json(result);
+                const token = jwt.sign({ _id: result._id, reviewerID: result.reviewerID }, JWTKey);
+                // res.status(result.status).json(result);
+                returnJson(res, result.status, result.status, result.message, { token });
             }
             else {
                 return next(createError(result.status, result.message));

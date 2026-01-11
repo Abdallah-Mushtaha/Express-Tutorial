@@ -29,7 +29,8 @@ export const getbooks = (req, res, next) => {
 
         try {
             const books = await db.find({}).limit(limit).skip(skip).toArray();
-            res.json(books);
+            // res.json(books);
+            returnJson(res, 200, 200, "Success", books);
         } catch (error) {
             // res.status(errors.status).json({ message: errors.message });
             next(errors);
@@ -44,7 +45,8 @@ export const getBooksCount = (req, res) => {
         try {
             const count = await db.count({});
             const pages = Math.ceil(count / limit);
-            res.json({ pages: pages });
+            // res.json({ pages: pages });
+            returnJson(res, 200, 200, "Success", { pages });
         } catch (error) {
             // res.status(errors.status).json({ message: errors.message });
             next(errors);
@@ -62,13 +64,15 @@ export const getBooksById = (req, res) => {
         try {
             const book = await db.findOne({ _id: id });
             if (book) {
-                res.json(book);
+                // res.json(book);
+                returnJson(res, 200, 200, "Success", book);
             } else {
                 // res.status(errors2.status).json({ message: errors2.message });
                 next(errors2);
             }
         } catch (error) {
-            res.status(500).json({ message: "Error fetching book" });
+            // res.status(500).json({ message: "Error fetching book" });
+            next(createError(500, "Error fetching book"));
         }
     });
 };
