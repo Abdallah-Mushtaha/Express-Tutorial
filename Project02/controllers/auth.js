@@ -1,12 +1,14 @@
 import { User, Reviews } from "../module/index.js";
 import createError from "http-errors";
+import jwt from "jsonwebtoken";
+import ReadFileSync from "fs";
 
 export const Sign_in = (req, res, next) => {
     const userData = req.body;
 
     const validation = User.validation(userData);
     if (validation.error) {
-        next(createError(400, validation.error.message));
+        return next(createError(400, validation.error.message));
     }
 
     const currentuser = new User(userData)
@@ -17,11 +19,11 @@ export const Sign_in = (req, res, next) => {
 
                 currentuser.save();
             } else {
-                next(createError(409, result.message));
+                return next(createError(409, result.message));
             }
         })
         .catch((error) => {
-            next(createError(500, error.message));
+            return next(createError(500, error.message));
         })
     currentuser.save(
         (status) => {
@@ -33,14 +35,33 @@ export const Sign_in = (req, res, next) => {
                         if (status.status === 201) {
                             res.status(status.status).json(status);
                         } else {
-                            next(createError(status.status, "user created but can't add review"));
+                            return next(createError(status.status, "user created but can't add review"));
                         }
                     }
                 );
 
             } else {
-                next(createError(status.status, status.message));
+                return next(createError(status.status, status.message));
             }
         }
     )
 }
+
+export const Log_in = (req, res, next) => {
+    User.login(req.body)
+        .then((result) => {
+            if (result.status === 200) {
+                const JWTKey = ReadFileSync("./config/privet.key");
+
+                const token = jwt.sign({ _id: result._id, reviewerID: result.reviewerID });
+                res.status(result.status).json(result);
+            }
+            else {
+                return next(createError(result.status, result.message));
+            }
+        })
+        .catch((error) => {
+            return next(createError(500, error.message));
+        })
+}
+

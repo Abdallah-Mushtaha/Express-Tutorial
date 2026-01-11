@@ -7,6 +7,11 @@ export const userSchema = joi.object({
     password: joi.string().min(8).max(30).pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*]+$')).message('Password must contain at least one special character').required()
 
 })
+
+export const loginSchema = joi.object({
+    name: joi.string().min(2).max(30).required(),
+    password: joi.string().required()
+})
 // regular expression بمعنى رح اكتب الشرط على شكل سترينك حروف
 // .+[A-Z].+
 // .+[a-z].+

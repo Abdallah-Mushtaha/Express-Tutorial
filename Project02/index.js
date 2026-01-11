@@ -11,7 +11,7 @@ process.on("uncaughtException", (reson) => {
         console.log(reson);
 });
 
-setupMiddleware(app);
+setupMiddleware.globalMiddleware(app);
 routes(app);
 
 // handling not found Error "not found route"

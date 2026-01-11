@@ -1,6 +1,7 @@
 import { dbConiction } from "../config/index.js";
-import { userValidator } from "../validatores/index.js";
+import { userValidator, loginValidator } from "../validatores/index.js";
 import hashsync from "bcryptjs";
+
 
 
 export class User {
@@ -78,6 +79,67 @@ export class User {
                 }
             })
         })
+    }
+
+    static login = (loginData) => {
+        return new Promise((resolve, reject) => {
+            const validator = loginValidator.validate(loginData);
+            if (validator.error) {
+                resolve({
+                    status: 400,
+                    message: validator.error.message
+                })
+            }
+            dbConiction("users", async (db) => {
+                try {
+                    // check the userName then compare the password 
+                    const user = await db.findOne({ username: loginData.username }, {
+                        projection: {
+                            username: 1,
+                            password: 1,
+                            _id: 0
+                        }
+                    });
+                    if (user) {
+                        dbConiction("reviews", async (db) => {
+                            const review = await db.findOne({ _user_id: user._id }, {
+
+                            })
+                            if (review) {
+                                user.review = review
+                            } else {
+                                resolve({
+                                    status: true,
+                                    data: user
+                                })
+                            }
+
+                        })
+                        const checkPassword = hashsync.compareSync(loginData.password, user.password);
+                        if (checkPassword) {
+                            resolve({
+                                status: true,
+                                data: user
+                            })
+                        } else {
+                            reject({
+                                status: false,
+                                Code: 401,
+                                message: "invalid password"
+
+                            })
+                        }
+                    }
+
+                } catch (error) {
+                    reject({
+                        status: 500,
+                        message: error.message
+                    })
+                }
+            })
+        })
+
     }
 }
 // const userData = { name: "ramy", username: "Ramy", email: "ramy@gmail.com", password: "0125453bAs" }
